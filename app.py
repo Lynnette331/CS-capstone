@@ -194,12 +194,9 @@ def register():
             dietary_restrictions=dietary_restrictions
         )
 
-        try:
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect(url_for('login'))
-        except Exception as e:
-            return render_template('register.html', error_message=str(e))
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('login'))
 
     return render_template('register.html')
 
