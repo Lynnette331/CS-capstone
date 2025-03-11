@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <link rel="stylesheet" href="/static/css/styles.css"> <!-- Link to the external CSS -->
+    <script defer src="/static/css/scripts.js"></script> <!-- Link to external JS -->
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -18,7 +19,13 @@
             <a href="/login">Login</a>
         {% endif %}
     </nav>
-    
+
+    <!-- Rounded switch -->
+    <label class="switch">
+        <input type="checkbox" id="theme-toggle">
+        <span class="slider round"></span>
+    </label>
+
     <!-- Profile Card -->
     <div class="profile-card">
         <div class="profile-header">

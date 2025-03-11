@@ -7,6 +7,7 @@ import pyodbc
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = 'password_secret_key_123'
+
 # Database Configuration
 DATABASE_CONFIG = {
     'server': 'sqlserverndibalekeralynette01.database.windows.net',
@@ -131,6 +132,19 @@ def restaurants():
     if request.method == 'GET' and 'term' in request.args:
         return get_restaurants()  # Use helper function for restaurant search
     return render_template('restaurants.html')
+
+@app.route('/submit-rating', methods=['POST'])
+def submit_rating():
+    data = request.get_json()
+    rating = data.get('rating')
+
+    if not rating:
+        return jsonify({"error": "No rating received"}), 400
+
+    # TODO: Save the rating to the database or log it
+    print(f"Received rating: {rating}")
+
+    return jsonify({"message": "Rating submitted successfully!"}), 200
 
 # Helper function for restaurant search
 @app.route('/restaurants/api', methods=['GET'])
