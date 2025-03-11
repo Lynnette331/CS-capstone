@@ -232,6 +232,59 @@ input:checked + .slider:before {
     align-items: center;
 }
 
+/* About Page Styling */
+.about-page{
+    background-image: url('/static/food.jpg'); /* Food background */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    height: 100vh;
+    padding: 40px;
+}
+
+.text-content {
+    max-width: 700px;
+    margin-top: 30px;
+}
+
+.text-content h2 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Adds shadow to text for better readability */
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    margin: 20px auto;
+}
+
+.text-content p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6); /* Adds shadow to text for better readability */
+    text-align: right;
+}
+
+.container {
+    width: 90%;
+    margin:0 auto;
+    padding: 10px 20px;
+}
+
+.about {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
 /* Home Page Styling */
 .home-page {
     background-image: url('/static/food.jpg'); /* Food background */
