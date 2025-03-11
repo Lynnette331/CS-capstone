@@ -7,6 +7,7 @@ import pyodbc
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = 'password_secret_key_123'
+
 # Database Configuration
 DATABASE_CONFIG = {
     'server': 'sqlserverndibalekeralynette01.database.windows.net',
@@ -133,6 +134,19 @@ def restaurants():
         return get_restaurants()  # Use helper function for restaurant search
     return render_template('restaurants.html')
 
+@app.route('/submit-rating', methods=['POST'])
+def submit_rating():
+    data = request.get_json()
+    rating = data.get('rating')
+
+    if not rating:
+        return jsonify({"error": "No rating received"}), 400
+
+    # TODO: Save the rating to the database or log it
+    print(f"Received rating: {rating}")
+
+    return jsonify({"message": "Rating submitted successfully!"}), 200
+
 # Helper function for restaurant search
 @app.route('/restaurants/api', methods=['GET'])
 def get_restaurants():
@@ -186,6 +200,11 @@ def register():
         dietary_restrictions = request.form['dietary_restrictions']
 
         password_hash = generate_password_hash(password)
+        
+        # Helps users realize they already have an account with the website
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            return render_template('register.html', error_message="This email already exists. Please use a different email.")
 
         new_user = User(
             username=username,
@@ -201,6 +220,28 @@ def register():
 
     return render_template('register.html')
 
+# Route for the forgot password page
+@app.route('/forgotpassword', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            # Here, you would generate a password reset link 
+            reset_link = f"http://yourwebsite.com/resetpassword/{user.user_id}" #once deployed, we will update the website name
+            flash(f"Password reset link sent to {email}", "success")
+            # TODO: Send email with reset_link (Use Flask-Mail or another email library) We will figure this out later
+        else:
+            flash("Email not found. Please check your email address.", "danger")
+
+    return render_template('forgotpassword.html')
+
+# Route for the about page
+@app.route('/about')
+def about():
+    return render_template('about.html')
+    
 # Route for the profile page
 @app.route('/profile/<int:user_id>')
 def profile(user_id):
