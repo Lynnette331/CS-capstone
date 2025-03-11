@@ -222,7 +222,11 @@ def forgot_password():
 
     return render_template('forgotpassword.html')
 
-
+# Route for the about page
+@app.route('/about')
+def about():
+    return render_template('about.html')
+    
 # Route for the profile page
 @app.route('/profile/<int:user_id>')
 def profile(user_id):
