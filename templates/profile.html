@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <title>Profile</title>
     <link rel="stylesheet" href="/static/css/styles.css"> <!-- Link to the external CSS -->
 </head>
 <body>
@@ -11,6 +11,7 @@
     <nav class="topnav">
         <a href="/home">Home</a>
         <a href="/restaurants">Restaurants</a>
+        <a href="/recommendations" class="recommendations-btn">Recommendations</a>
         {% if 'user_id' in session %}
             <a href="/profile/{{ session['user_id'] }}">Profile</a>
             <a href="/logout">Logout</a>
@@ -39,6 +40,15 @@
         </div>
     </div>
 
+    <!-- Profile Information -->
+    <div class="profile-container">
+        <h1>Profile</h1>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Favorite Cuisines:</strong> {{ user.favorite_cuisines }}</p>
+        <p><strong>Dietary Restrictions:</strong> {{ user.dietary_restrictions }}</p>
+
+        
     <!-- Footer -->
     <footer>
         <p>&copy; 2024 Are You Hungry? All rights reserved.</p>

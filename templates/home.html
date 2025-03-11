@@ -12,6 +12,7 @@
     <nav class="topnav">
         <a href="/home">Home</a>
         <a href="/restaurants">Restaurants</a>
+        <a href="/recommendations" class="recommendations-btn">Recommendations</a>
         {% if 'user_id' in session %}
             <a href="/profile/{{ session['user_id'] }}">Profile</a>
             <a href="/logout">Logout</a>
@@ -24,8 +25,8 @@
     <!-- Content Block (Home Page) -->
     <div class="home-page">
         <div class="text-content">
-            <h2>Are you hungry? &#129316;</h2>
-            <p>Welcome to our platform, where discovering your next favorite meal is effortless! Simply explore your options and let us guide you to a delightful dining experience. For a more personalized touch, sign up to save your preferences and streamline your future visits. Enjoy!</p>
+        <h2>Are you hungry? &#129316;</h2>
+        <p>Welcome to our platform, where discovering your next favorite meal is effortless! Simply explore your options and let us guide you to a delightful dining experience. For a more personalized touch, sign up to save your preferences and streamline your future visits. Enjoy!</p>
         </div>
     </div>
 

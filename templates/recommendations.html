@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Recommendations</title>
+    <link rel="stylesheet" href="/static/css/styles.css"> <!-- Link to the external CSS -->
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="topnav">
+        <a href="/home">Home</a>
+        <a href="/restaurants">Restaurants</a>
+        <a href="/recommendations" class="recommendations-btn">Recommendations</a>
+        {% if 'user_id' in session %}
+            <a href="/profile/{{ session['user_id'] }}">Profile</a>
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1>Restaurant Recommendations</h1>
+        <p>Based on your favorite cuisines and dietary restrictions.</p>
+    </header>
+
+    <!-- Recommendations Container -->
+    <div class="recommendations-container">
+        <!-- Restaurant Cards Section -->
+        {% if restaurants %}
+            {% for restaurant in restaurants %}
+                <div class="restaurant-card">
+                    <h2>{{ restaurant.name }}</h2>
+                    <p><strong>Address:</strong> {{ restaurant.address }}</p>
+                    <p><strong>Rating:</strong> ⭐ {{ restaurant.rating or 'N/A' }}</p>
+                    <p><strong>Cuisine:</strong> {{ restaurant.cuisine | join(', ') }}</p>
+                    <p><strong>Phone:</strong> {{ restaurant.phone }}</p>
+                    <a href="{{ restaurant.website }}" class="btn visit-btn" target="_blank">Visit Website</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-results">No recommendations available at the moment.</p>
+        {% endif %}
+    </div> <!-- Closing recommendations-container div -->
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Are You Hungry? All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+

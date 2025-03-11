@@ -106,7 +106,7 @@ def login():
                 # Set session variables
                 session['user_id'] = user.user_id
                 session['username'] = user.username
-                print(f"Session: {session}")
+                print(f"Session after login: {session}")
 
                 # Use url_for to generate the correct URL for the profile
                 return redirect(url_for('profile', user_id=user.user_id))
@@ -120,6 +120,7 @@ def login():
             return render_template('login.html', error_message="An error occurred during login")
 
     return render_template('login.html')
+    
 #app route for log out 
 @app.route('/logout')
 def logout():
@@ -225,6 +226,52 @@ def profile(user_id):
 
     # Render the profile template
     return render_template('profile.html', user=user)
+
+#Route for the recommendations page
+@app.route('/recommendations', methods=['GET'])
+def recommendations():
+    if 'user_id' not in session:
+        print("User not logged in, redirecting to login page.")
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        print("User not found, redirecting to login page.")
+        return redirect(url_for('login'))
+
+    # Define latitude and longitude
+    latitude = 41.619549  # Example latitude
+    longitude = -93.598022  # Example longitude
+
+    # Get user's favorite cuisine and dietary restrictions
+    favorite_cuisines = [cuisine.strip().lower() for cuisine in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
+    dietary_restrictions = [restriction.strip().lower() for restriction in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
+
+    print(f"Favorite Cuisines: {favorite_cuisines}")
+    print(f"Dietary Restrictions: {dietary_restrictions}")
+
+    # Fetch the restaurants
+    all_restaurants = search_restaurants("restaurants", latitude, longitude, 25000, 20)
+
+    # Filter restaurants based on user preferences
+    recommended_restaurants = []
+    for r in all_restaurants:
+        restaurant_categories = [cat.get("title").lower() for cat in r.get("categories", [])]
+        print(f"Restaurant: {r.get('name', 'N/A')}, Categories: {restaurant_categories}")
+        if any(cat in favorite_cuisines for cat in restaurant_categories):
+            recommended_restaurants.append({
+                "name": r.get("name", "N/A"),
+                "address": ", ".join(r.get("location", {}).get("display_address", [])),
+                "rating": r.get("rating", None),
+                "website": r.get("url", "No website available"),
+                "cuisine": restaurant_categories,
+                "phone": r.get("phone", "No phone available"),
+            })
+
+    print(f"Recommended Restaurants: {recommended_restaurants}")
+
+    print("Rendering recommendations.html with recommended restaurants.")
+    return render_template('recommendations.html', restaurants=recommended_restaurants)
 
 #Route for Updating profile 
 @app.route('/update_profile', methods=['POST'])

@@ -250,11 +250,30 @@ body {
     text-decoration: underline;
 }
 
+/* Recommendations button*/
+.topnav .recommendations-btn {
+    display: inline-block;
+    background-color: #F8AFA6; /* Tomato Red */
+    padding: 16px 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: none;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.recommendations-btn:hover {
+    background-color: #F8AFA6; /* Darker Red */
+    transition: 0.3s;
+}
+
 /* Button Styling */
 .btn {
-    background-color: #ff6347; /* Tomato red button */
-    color: white;
-    border: none;
+    background-color: white; /* Change to white */
+    color: black; /* Change text color to black */
+    border: 1px solid #ccc; /* Add a light border */
     padding: 12px 20px;
     margin-top: 15px;
     cursor: pointer;
@@ -264,7 +283,7 @@ body {
 }
 
 .btn:hover {
-    background-color: #ff4500; /* Darker red on hover */
+    background-color: #f0f0f0; /* Light grey on hover */
 }
 
 /* Register Link */
