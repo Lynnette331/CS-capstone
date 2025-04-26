@@ -6,8 +6,9 @@ import requests
 
 #API_KEY = "DVMFX1f7xi1FDI2DnaeMoOwTtgH3y5CUpDT-Md1Xgg8BZhW1wUgnnUlJNNOMl92iuAxCUPFI_9mLs0iFFwfNLa_rFnDzSx2SzDChW1dwzlfNEz8G-ZEf9gy2RS-2Z3Yx"
  
-API_KEY = "DVMFX1f7xi1FDI2DnaeMoOwTtgH3y5CUpDT-Md1Xgg8BZhW1wUgnnUlJNNOMl92iuAxCUPFI_9mLs0iFFwfNLa_rFnDzSx2SzDChW1dwzlfNEz8G-ZEf9gy2RS-2Z3Yx"
+#API_KEY = "DVMFX1f7xi1FDI2DnaeMoOwTtgH3y5CUpDT-Md1Xgg8BZhW1wUgnnUlJNNOMl92iuAxCUPFI_9mLs0iFFwfNLa_rFnDzSx2SzDChW1dwzlfNEz8G-ZEf9gy2RS-2Z3Yx"
 
+API_KEY = "MGye3-tgBQFs57g9g7yvjRdoT-UEECMME-OyjsNZa9nMKWajKe5Ss3Czgbus9IMU-kD3NUVdL-uvLGf1Loq4b4rIlfu4VTikf03_PTfeR-vfAvpNCuUfFtwt7XgGaHYx"
 # Define constants
 
 BASE_URL = "https://api.yelp.com/v3/businesses/search"

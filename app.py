@@ -255,52 +255,45 @@ def profile(user_id):
     # Handle the case where the user is not found
     if not user:
         return render_template('404.html'), 404
-
-    # Debugging information
-    print(f"User ID in session: {session['user_id']}")
-    print(f"Requested User ID: {user_id}")
-    print(f"User info: {user.username}, {user.email}")
-
-    # Ensure that the logged-in user can only access their own profile
+    
     if session['user_id'] != user_id:
         return redirect(url_for('profile', user_id=session['user_id']))
-
-    # Render the profile template
-    return render_template('profile.html', user=user)
-
-#Route for the recommendations page
-@app.route('/recommendations', methods=['GET'])
-def recommendations():
-    if 'user_id' not in session:
-        print("User not logged in, redirecting to login page.")
-        return redirect(url_for('login'))
     
-    user = User.query.get(session['user_id'])
-    if not user:
-        print("User not found, redirecting to login page.")
-        return redirect(url_for('login'))
+    # Fetch user's preferences
+    favorite_cuisines = [c.strip().lower() for c in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
+    dietary_restrictions = [d.strip().lower() for d in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
 
-    # Define latitude and longitude
-    latitude = 41.619549  # Example latitude
-    longitude = -93.598022  # Example longitude
 
-    # Get user's favorite cuisine and dietary restrictions
-    favorite_cuisines = [cuisine.strip().lower() for cuisine in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
-    dietary_restrictions = [restriction.strip().lower() for restriction in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
+    # Debugging information
+    #print(f"User ID in session: {session['user_id']}")
+   # print(f"Requested User ID: {user_id}")
+   # print(f"User info: {user.username}, {user.email}")
+   # print(f"Favorite Cuisines: {favorite_cuisines}")
+   # print(f"Dietary Restrictions: {dietary_restrictions}")
 
-    print(f"Favorite Cuisines: {favorite_cuisines}")
-    print(f"Dietary Restrictions: {dietary_restrictions}")
+    # Ensure that the logged-in user can only access their own profile
+    #if session['user_id'] != user_id:
+       # return redirect(url_for('profile', user_id=session['user_id']))
+    
+    # Debugging information (replace with proper logging in production)
+    current_app.logger.info(f"User ID: {user_id}, Favorite Cuisines: {favorite_cuisines}, Dietary Restrictions: {dietary_restrictions}")
 
-    # Fetch the restaurants
-    all_restaurants = search_restaurants("restaurants", latitude, longitude, 25000, 20)
+    # Fetch restaurants using the YelpAPI or database
+    #all_restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 25000, 50)  # Example location and radius
+
+    # Fetch restaurants using the YelpAPI
+    try:
+        all_restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 25000, 50)  # Example location and radius
+    except Exception as e:
+        current_app.logger.error(f"Error fetching restaurants: {e}")
+        all_restaurants = []
 
     # Filter restaurants based on user preferences
-    recommended_restaurants = []
+    recommendations = []
     for r in all_restaurants:
         restaurant_categories = [cat.get("title").lower() for cat in r.get("categories", [])]
-        print(f"Restaurant: {r.get('name', 'N/A')}, Categories: {restaurant_categories}")
-        if any(cat in favorite_cuisines for cat in restaurant_categories):
-            recommended_restaurants.append({
+        if any(cuisine in restaurant_categories for cuisine in favorite_cuisines):
+            recommendations.append({
                 "name": r.get("name", "N/A"),
                 "address": ", ".join(r.get("location", {}).get("display_address", [])),
                 "rating": r.get("rating", None),
@@ -308,11 +301,15 @@ def recommendations():
                 "cuisine": restaurant_categories,
                 "phone": r.get("phone", "No phone available"),
             })
-
-    print(f"Recommended Restaurants: {recommended_restaurants}")
-
-    print("Rendering recommendations.html with recommended restaurants.")
-    return render_template('recommendations.html', restaurants=recommended_restaurants)
+        if len(recommendations) >= 5:  # Limit to 5 recommendations
+            break
+    
+    # Handle empty recommendations
+    if not recommendations:
+        recommendations = [{"name": "No recommendations available. Update your preferences to get personalized suggestions!"}]
+        
+    # Render the profile template
+    return render_template('profile.html', user=user, favorite_cuisines=favorite_cuisines, recommendations=recommendations)
 
 #Route for Updating profile 
 @app.route('/update_profile', methods=['POST'])
@@ -326,8 +323,8 @@ def update_profile():
         return redirect(url_for('login'))
     
     # Update user preferences
-    user.favorite_cuisines = request.form['favorite_cuisines']
-    user.dietary_restrictions = request.form['dietary_restrictions']
+    user.favorite_cuisines = request.form.get('favorite_cuisines', '')
+    user.dietary_restrictions = request.form.get('dietary_restrictions', '')
     
     try:
         db.session.commit()
