@@ -1,3 +1,4 @@
+
 #Introduction
 
 Welcome to the Are You Hungry? Project! This project is a web-based application designed to simplify restaurant discovery and meal planning by leveraging the Yelp API. Users can search for restaurants, filter by cuisines, and save their preferences. It also includes features like user authentication and a personalized experience based on dietary restrictions and favorite cuisines.
@@ -47,3 +48,4 @@ If you want to learn more about creating good readme files then refer the follow
 - [ASP.NET Core](https://github.com/aspnet/Home)
 - [Visual Studio Code](https://github.com/Microsoft/vscode)
 - [Chakra Core](https://github.com/Microsoft/ChakraCore)
+=======
