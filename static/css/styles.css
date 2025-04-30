@@ -28,7 +28,7 @@ body.dark-mode {
 /* Navigation Bar */
 .topnav {
     overflow: hidden;
-    background-color: #F9AFA6; /* Default navigation background color */
+    background-color: #004477; /* Default navigation background color */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -43,12 +43,12 @@ body.dark-mode {
 }
 
 .topnav a:hover {
-    background-color: #F8AFA6; /* Slightly darker pink when hovered */
+    background-color: #58819f; /* Slightly lighter blue when hovered */
     color: #fff;
 }
 
 .topnav .active {
-    background-color: #FF6347; /* Tomato red for active link */
+    background-color: #58819f; /* Lighter blue for active link */
     color: white;
 }
 
@@ -225,7 +225,7 @@ input:checked + .slider:before {
 
 /* Login Page Gradient Background */
 .login-page {
-    background: linear-gradient(to bottom right, #D1B1A8, #F0E3D2); /* Soft beige to light brown gradient */
+    background: linear-gradient(to bottom right, #FFFAFA, #FFFAFA); /* Soft beige to light brown gradient */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -321,7 +321,7 @@ input:checked + .slider:before {
 .login-container {
     background-color: var(--login-box-color); /* Semi-transparent white background */
     padding: 40px 60px;
-    border: 2px solid #FFC0CB; /* Pink border */
+    border: 2px solid #58819f; /* Light Blue border */
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -373,7 +373,7 @@ input:checked + .slider:before {
 /* Recommendations button*/
 .topnav .recommendations-btn {
     display: inline-block;
-    background-color: #F8AFA6; /* Tomato Red */
+    background-color: #004477; /* Drake Blue */
     padding: 16px 20px;
     border-radius: 5px;
     text-align: center;
@@ -385,7 +385,7 @@ input:checked + .slider:before {
 }
 
 .recommendations-btn:hover {
-    background-color: #F8AFA6; /* Darker Red */
+    background-color: #58819f; /* Lighter Blue */
     transition: 0.3s;
 }
 
@@ -422,14 +422,14 @@ input:checked + .slider:before {
 
 /* Profile Card Styling */
 .profile-card {
-    background: linear-gradient(to right, #ff9a9e, #fad0c4); /* Gradient background */
+    background: linear-gradient(to right, #77C3EC, #B8E2F2); /* Gradient background */
     border-radius: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     margin: 40px auto;
     text-align: center;
     padding: 20px;
-    color: #333;
+    color: #FFF;
     font-family: Arial, sans-serif;
 }
 
@@ -468,7 +468,7 @@ input:checked + .slider:before {
 .profile-stats h3 {
     margin: 0;
     font-size: 1.2em;
-    color: #ff6347;
+    color: #004477;
 }
 
 .profile-stats p {
@@ -486,7 +486,7 @@ input:checked + .slider:before {
 }
 
 .explore-btn, .update-btn {
-    background-color: #ff9a9e; /* Soft gradient color */
+    background-color: #58819f; /* Soft blue gradient color */
     border: none;
     color: white;
     border-radius: 5px;
@@ -499,16 +499,16 @@ input:checked + .slider:before {
 }
 
 .explore-btn:hover {
-    background-color: #fad0c4; /* Light gradient hover */
+    background-color: #bcd7eb; /* Lighter blue gradient hover */
 }
 
 .update-btn:hover {
-    background-color: #ff6347; /* Tomato red */
+    background-color: #004477; /* Drake blue */
 }
 
 /* Additional Styling for the Form */
 input:focus {
-    border-color: #ff6347; /* Red focus border */
+    border-color: #58819f; /* Light Blue focus border */
 }
 
 button:focus {
@@ -517,7 +517,7 @@ button:focus {
 
 /* Footer Styling */
 footer {
-    background-color: #FF9A8B; /* Soft pink footer */
+    background-color: #004477; /* Drake blue footer */
     text-align: center;
     padding: 10px 0;
     color: #fff;
