@@ -221,14 +221,14 @@ def register():
 @app.route('/forgotpassword', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        answer = request.form['security_question_answer']
+        username = request.form['username']
 
-        # Here, you'd check if the answer matches
-        if answer.lower() == 'correct_answer':  # Replace with your checking logic
-            session['reset_user'] = 'username_or_id'  # Save who is resetting!
-            return redirect(url_for('create_password'))  # Redirect to create password page
+        # Here, you would usually check if the username exists
+        if username:  # Simple check; in real apps, check the database
+            session['reset_user'] = username
+            return redirect(url_for('create_password'))  # Go to new password page
         else:
-            return render_template('forgotpassword.html', error_message='Incorrect answer. Try again!')
+            return render_template('forgotpassword.html', error_message='Please enter a username.')
 
     return render_template('forgotpassword.html')
 
@@ -236,7 +236,7 @@ def forgot_password():
 @app.route('/createpassword', methods=['GET', 'POST'])
 def create_password():
     if 'reset_user' not in session:
-        return redirect(url_for('forgot_password'))  # Don't allow access if they didn't come from forgot password
+        return redirect(url_for('forgotpassword'))  # Don't allow access if they didn't come from forgot password
 
     if request.method == 'POST':
         new_password = request.form['new_password']
@@ -244,13 +244,17 @@ def create_password():
 
         if new_password != confirm_password:
             return render_template('createpassword.html', error_message='Passwords do not match.')
+        
+        if len(new_password) < 8:
+            return render_template('createpassword.html', error_message='Password must be at least 8 characters long.')
 
-        # Save new_password for user in database here!
+        # Save new_password for user in the database here!
         # After successful password reset:
         session.pop('reset_user', None)  # Remove reset session
         return redirect(url_for('login'))  # Redirect back to login page
 
     return render_template('createpassword.html')
+
 
 
 
@@ -356,4 +360,5 @@ def update_profile():
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
+
 
