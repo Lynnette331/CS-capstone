@@ -54,8 +54,6 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
-def __repr__(self):
-        return f'<User {self.username}>'
 
 # Cuisine Mapping
 CUISINE_MAPPING = {
@@ -95,25 +93,31 @@ CUISINE_MAPPING = {
 def home():
     return render_template('home.html')  # Ensure you have a home.html file in the templates folder
 
-# Login route
+# Route for the login page
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        user = User.query.filter_by(username=username).first()  # Fetch user by username
+        user = User.query.filter_by(username=username).first()
 
-        if user and check_password_hash(user.password_hash, password):  # Compare with password_hash
-            # Successful login logic
-            session['user_id'] = user.id
-            return redirect(url_for('dashboard'))  # Or your target page
+        if user:
+            if check_password_hash(user.password_hash, password):
+                session['user_id'] = user.user_id
+                session['username'] = user.username
+                return redirect(url_for('profile', user_id=user.user_id))
+            else:
+                # Password is incorrect
+                error_message = "Incorrect password."
+                return render_template('login.html', error_message=error_message)
         else:
-            return render_template('login.html', error_message='Invalid credentials.')
+            # No user found
+            error_message = "Username does not exist."
+            return render_template('login.html', error_message=error_message)
 
     return render_template('login.html')
-
-
+    
 #app route for log out 
 @app.route('/logout')
 def logout():
@@ -218,22 +222,24 @@ def register():
 def forgot_password():
     if request.method == 'POST':
         username = request.form['username']
-
-        # Check if user exists in the database
+        
+        # Check if the username exists in the database
         user = User.query.filter_by(username=username).first()
+        
         if user:
-            session['reset_user'] = user.username  # store username in session
+            session['reset_user'] = username
             return redirect(url_for('create_password'))
         else:
-            return render_template('forgotpassword.html', error_message='Username not found.')
-
+            return render_template('forgotpassword.html', error_message='Username not found. Please try again.')
+    
     return render_template('forgotpassword.html')
+
 
 # Route for create password page
 @app.route('/createpassword', methods=['GET', 'POST'])
 def create_password():
     if 'reset_user' not in session:
-        return redirect(url_for('forgot_password'))
+        return redirect(url_for('forgotpassword'))  # Don't allow access if they didn't come from forgot password
 
     if request.method == 'POST':
         new_password = request.form['new_password']
@@ -241,24 +247,25 @@ def create_password():
 
         if new_password != confirm_password:
             return render_template('createpassword.html', error_message='Passwords do not match.')
-        
+
         if len(new_password) < 8:
             return render_template('createpassword.html', error_message='Password must be at least 8 characters long.')
 
-        # Hash the new password
-        password_hash = generate_password_hash(new_password)
-
-        # Update the user's password hash in the database
+        # Find the user based on the session stored username
         user = User.query.filter_by(username=session['reset_user']).first()
+        
         if user:
-            user.password_hash = password_hash  # Save the hashed password
+            user.password_hash = generate_password_hash(new_password)
             db.session.commit()
-            session.pop('reset_user', None)
-            return redirect(url_for('login'))
+            session.pop('reset_user', None)  # Clear reset_user session
+            return redirect(url_for('login'))  # Redirect to the login page after resetting password
         else:
             return render_template('createpassword.html', error_message='User not found.')
-
+    
     return render_template('createpassword.html')
+
+
+
 
 # Route for the about page
 @app.route('/about')
@@ -362,7 +369,6 @@ def update_profile():
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
-
 
 
 
