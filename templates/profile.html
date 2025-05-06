@@ -29,8 +29,33 @@
     <!-- Profile Card -->
     <div class="profile-card">
         <div class="profile-header">
-            <img src="{{ url_for('static', filename='pfp.png') }}" alt="Profile Picture" class="profile-image">
-        </div>       
+            <img src="{{ url_for('static', filename=user.profile_icon) if user.profile_icon else 'https://via.placeholder.com/150' }}" alt="Profile Picture" class="profile-image">
+        </div>   
+        <div class="profile-icon-selection">
+            <h3>Select Your Profile Icon</h3>
+            <form method="POST" action="{{ url_for('update_profile') }}">
+                <div class="icon-options">
+                    <label>
+                        <input type="radio" name="profile_icon" value="img1.jpeg" {% if user.profile_icon == 'img1.jpeg' %}checked{% endif %}>
+                        <img src="{{ url_for('static', filename='img1.jpeg') }}" alt="cool Icon" width="50">
+                    </label>
+                    <label>
+                        <input type="radio" name="profile_icon" value="img2.jpeg" {% if user.profile_icon == 'img2.jpeg' %}checked{% endif %}>
+                        <img src="{{ url_for('static', filename='img2.jpeg') }}" alt="happy Icon" width="50">
+                    </label>
+                    <label>
+                        <input type="radio" name="profile_icon" value="img3.jpeg" {% if user.profile_icon == 'like.jpeg' %}checked{% endif %}>
+                        <img src="{{ url_for('static', filename='img3.jpeg') }}" alt="like Icon" width="50">
+                    </label>
+                    <label>
+                        <input type="radio" name="profile_icon" value="img4.jpeg" {% if user.profile_icon == 'hungry.jpeg' %}checked{% endif %}>
+                        <img src="{{ url_for('static', filename='img4.jpeg') }}" alt="hungry Icon" width="50">
+                    </label>
+                    <label>
+                </div>
+                <button type="submit" class="btn save-btn">Save Icon</button>
+            </form>
+        </div>    
         <div class="profile-content">
             <h1>Welcome, {{ user.username }}!</h1>
             <p><strong>Email:</strong> {{ user.email }}</p>

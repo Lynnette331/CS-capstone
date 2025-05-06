@@ -51,6 +51,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128), nullable=False)
     favorite_cuisines = db.Column(db.Text)
     dietary_restrictions = db.Column(db.Text)
+    profile_icon = db.Column(db.String(200),  default='cool.png')
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
@@ -264,22 +265,9 @@ def profile(user_id):
     dietary_restrictions = [d.strip().lower() for d in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
 
 
-    # Debugging information
-    #print(f"User ID in session: {session['user_id']}")
-   # print(f"Requested User ID: {user_id}")
-   # print(f"User info: {user.username}, {user.email}")
-   # print(f"Favorite Cuisines: {favorite_cuisines}")
-   # print(f"Dietary Restrictions: {dietary_restrictions}")
-
-    # Ensure that the logged-in user can only access their own profile
-    #if session['user_id'] != user_id:
-       # return redirect(url_for('profile', user_id=session['user_id']))
-    
     # Debugging information (replace with proper logging in production)
     current_app.logger.info(f"User ID: {user_id}, Favorite Cuisines: {favorite_cuisines}, Dietary Restrictions: {dietary_restrictions}")
 
-    # Fetch restaurants using the YelpAPI or database
-    #all_restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 25000, 50)  # Example location and radius
 
     # Fetch restaurants using the YelpAPI
     try:
@@ -325,6 +313,7 @@ def update_profile():
     # Update user preferences
     user.favorite_cuisines = request.form.get('favorite_cuisines', '')
     user.dietary_restrictions = request.form.get('dietary_restrictions', '')
+    user.profile_icon = request.form.get('profile_icon', user.profile_icon)  
     
     try:
         db.session.commit()
