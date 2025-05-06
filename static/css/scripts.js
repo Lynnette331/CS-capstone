@@ -3,7 +3,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const themeToggle = document.getElementById('theme-toggle');
     const currentTheme = localStorage.getItem('theme');
-          
+
+    if (!themeToggle) {
+        console.warn('No element with id "theme-toggle" found!');
+        return;
+    }
 
     if (currentTheme) {
         document.body.classList.add(currentTheme);

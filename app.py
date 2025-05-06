@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, current_app, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, current_app, flash 
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from YelpAPI import search_restaurants
@@ -101,25 +101,21 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        try:
-            user = User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
 
-            if user and check_password_hash(user.password_hash, password):
-                # Set session variables
+        if user:
+            if check_password_hash(user.password_hash, password):
                 session['user_id'] = user.user_id
                 session['username'] = user.username
-                print(f"Session after login: {session}")
-
-                # Use url_for to generate the correct URL for the profile
                 return redirect(url_for('profile', user_id=user.user_id))
             else:
-                # Flash message for invalid credentials
-                return render_template('login.html', error_message="Invalid username or password")
-        
-        except Exception as e:
-            # Log the error and show a generic error message
-            current_app.logger.error(f"Login error: {e}")
-            return render_template('login.html', error_message="An error occurred during login")
+                # Password is incorrect
+                error_message = "Incorrect password."
+                return render_template('login.html', error_message=error_message)
+        else:
+            # No user found
+            error_message = "Username does not exist."
+            return render_template('login.html', error_message=error_message)
 
     return render_template('login.html')
     
@@ -128,6 +124,7 @@ def login():
 def logout():
     session.clear()  # Clear the session
     return redirect(url_for('login'))
+
 # Route for the restaurants page
 @app.route('/restaurants', methods=['GET'])
 def restaurants():
@@ -221,22 +218,55 @@ def register():
 
     return render_template('register.html')
 
-# Route for the forgot password page
+# Route for forgot password page
 @app.route('/forgotpassword', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email']
-        user = User.query.filter_by(email=email).first()
-
+        username = request.form['username']
+        
+        # Check if the username exists in the database
+        user = User.query.filter_by(username=username).first()
+        
         if user:
-            # Here, you would generate a password reset link 
-            reset_link = f"http://yourwebsite.com/resetpassword/{user.user_id}" #once deployed, we will update the website name
-            flash(f"Password reset link sent to {email}", "success")
-            # TODO: Send email with reset_link (Use Flask-Mail or another email library) We will figure this out later
+            session['reset_user'] = username
+            return redirect(url_for('create_password'))
         else:
-            flash("Email not found. Please check your email address.", "danger")
-
+            return render_template('forgotpassword.html', error_message='Username not found. Please try again.')
+    
     return render_template('forgotpassword.html')
+
+
+# Route for create password page
+@app.route('/createpassword', methods=['GET', 'POST'])
+def create_password():
+    if 'reset_user' not in session:
+        return redirect(url_for('forgotpassword'))  # Don't allow access if they didn't come from forgot password
+
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if new_password != confirm_password:
+            return render_template('createpassword.html', error_message='Passwords do not match.')
+
+        if len(new_password) < 8:
+            return render_template('createpassword.html', error_message='Password must be at least 8 characters long.')
+
+        # Find the user based on the session stored username
+        user = User.query.filter_by(username=session['reset_user']).first()
+        
+        if user:
+            user.password_hash = generate_password_hash(new_password)
+            db.session.commit()
+            session.pop('reset_user', None)  # Clear reset_user session
+            return redirect(url_for('login'))  # Redirect to the login page after resetting password
+        else:
+            return render_template('createpassword.html', error_message='User not found.')
+    
+    return render_template('createpassword.html')
+
+
+
 
 # Route for the about page
 @app.route('/about')
@@ -256,32 +286,55 @@ def profile(user_id):
     # Handle the case where the user is not found
     if not user:
         return render_template('404.html'), 404
-    
-    if session['user_id'] != user_id:
-        return redirect(url_for('profile', user_id=session['user_id']))
-    
-    # Fetch user's preferences
-    favorite_cuisines = [c.strip().lower() for c in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
-    dietary_restrictions = [d.strip().lower() for d in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
-
 
     # Debugging information (replace with proper logging in production)
     current_app.logger.info(f"User ID: {user_id}, Favorite Cuisines: {favorite_cuisines}, Dietary Restrictions: {dietary_restrictions}")
 
+    # Debugging information
+    print(f"User ID in session: {session['user_id']}")
+    print(f"Requested User ID: {user_id}")
+    print(f"User info: {user.username}, {user.email}")
 
-    # Fetch restaurants using the YelpAPI
-    try:
-        all_restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 25000, 50)  # Example location and radius
-    except Exception as e:
-        current_app.logger.error(f"Error fetching restaurants: {e}")
-        all_restaurants = []
+    # Ensure that the logged-in user can only access their own profile
+    if session['user_id'] != user_id:
+        return redirect(url_for('profile', user_id=session['user_id']))
+
+    # Render the profile template
+    return render_template('profile.html', user=user)
+
+#Route for the recommendations page
+@app.route('/recommendations', methods=['GET'])
+def recommendations():
+    if 'user_id' not in session:
+        print("User not logged in, redirecting to login page.")
+        return redirect(url_for('login'))
+    
+    user = User.query.get(session['user_id'])
+    if not user:
+        print("User not found, redirecting to login page.")
+        return redirect(url_for('login'))
+
+    # Define latitude and longitude
+    latitude = 41.619549  # Example latitude
+    longitude = -93.598022  # Example longitude
+
+    # Get user's favorite cuisine and dietary restrictions
+    favorite_cuisines = [cuisine.strip().lower() for cuisine in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
+    dietary_restrictions = [restriction.strip().lower() for restriction in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
+
+    print(f"Favorite Cuisines: {favorite_cuisines}")
+    print(f"Dietary Restrictions: {dietary_restrictions}")
+
+    # Fetch the restaurants
+    all_restaurants = search_restaurants("restaurants", latitude, longitude, 25000, 20)
 
     # Filter restaurants based on user preferences
-    recommendations = []
+    recommended_restaurants = []
     for r in all_restaurants:
         restaurant_categories = [cat.get("title").lower() for cat in r.get("categories", [])]
-        if any(cuisine in restaurant_categories for cuisine in favorite_cuisines):
-            recommendations.append({
+        print(f"Restaurant: {r.get('name', 'N/A')}, Categories: {restaurant_categories}")
+        if any(cat in favorite_cuisines for cat in restaurant_categories):
+            recommended_restaurants.append({
                 "name": r.get("name", "N/A"),
                 "address": ", ".join(r.get("location", {}).get("display_address", [])),
                 "rating": r.get("rating", None),
@@ -289,15 +342,11 @@ def profile(user_id):
                 "cuisine": restaurant_categories,
                 "phone": r.get("phone", "No phone available"),
             })
-        if len(recommendations) >= 5:  # Limit to 5 recommendations
-            break
-    
-    # Handle empty recommendations
-    if not recommendations:
-        recommendations = [{"name": "No recommendations available. Update your preferences to get personalized suggestions!"}]
-        
-    # Render the profile template
-    return render_template('profile.html', user=user, favorite_cuisines=favorite_cuisines, recommendations=recommendations)
+
+    print(f"Recommended Restaurants: {recommended_restaurants}")
+
+    print("Rendering recommendations.html with recommended restaurants.")
+    return render_template('recommendations.html', restaurants=recommended_restaurants)
 
 #Route for Updating profile 
 @app.route('/update_profile', methods=['POST'])
@@ -325,4 +374,7 @@ def update_profile():
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
 
