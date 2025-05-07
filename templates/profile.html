@@ -49,16 +49,15 @@
                         <img src="{{ url_for('static', filename='img2.jpeg') }}" alt="happy Icon" width="50">
                     </label>
                     <label>
-                        <input type="radio" name="profile_icon" value="img3.jpeg" {% if user.profile_icon == 'like.jpeg' %}checked{% endif %}>
+                        <input type="radio" name="profile_icon" value="img3.jpeg" {% if user.profile_icon == 'img3.jpeg' %}checked{% endif %}>
                         <img src="{{ url_for('static', filename='img3.jpeg') }}" alt="like Icon" width="50">
                     </label>
                     <label>
-                        <input type="radio" name="profile_icon" value="img4.jpeg" {% if user.profile_icon == 'hungry.jpeg' %}checked{% endif %}>
+                        <input type="radio" name="profile_icon" value="img4.jpeg" {% if user.profile_icon == 'img4.jpeg' %}checked{% endif %}>
                         <img src="{{ url_for('static', filename='img4.jpeg') }}" alt="hungry Icon" width="50">
                     </label>
-                    <label>
                 </div>
-                <button type="submit" class="btn save-btn">Save Icon</button>
+                <button type="submit" class="btn save-btn">Save Profile</button>
             </form>
         </div>    
         <div class="profile-content">
@@ -73,7 +72,7 @@
               
         <h2>Recommendations</h2>
         <div class="recommendations-container">
-            {% if recommendations and recommendations[0].name != "No recommendations available. Update your preferences to get personalized suggestions!" %}
+            {% if recommendations %}
                 {% for rec in recommendations %}
                     <div class="restaurant-card">
                         <h3>{{ rec.name }}</h3>

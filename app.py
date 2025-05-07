@@ -282,58 +282,29 @@ def profile(user_id):
 
     # Retrieve the user from the database
     user = User.query.get(user_id)
-    
-    # Handle the case where the user is not found
     if not user:
         return render_template('404.html'), 404
 
-    # Debugging information (replace with proper logging in production)
-    current_app.logger.info(f"User ID: {user_id}, Favorite Cuisines: {favorite_cuisines}, Dietary Restrictions: {dietary_restrictions}")
+    # Process favorite cuisines and dietary restrictions
+    favorite_cuisines = [cuisine.strip().lower() for cuisine in (user.favorite_cuisines or "").split(",") if cuisine.strip()]
+    dietary_restrictions = [restriction.strip().lower() for restriction in (user.dietary_restrictions or "").split(",") if restriction.strip()]
 
     # Debugging information
-    print(f"User ID in session: {session['user_id']}")
-    print(f"Requested User ID: {user_id}")
-    print(f"User info: {user.username}, {user.email}")
-
-    # Ensure that the logged-in user can only access their own profile
-    if session['user_id'] != user_id:
-        return redirect(url_for('profile', user_id=session['user_id']))
-
-    # Render the profile template
-    return render_template('profile.html', user=user)
-
-#Route for the recommendations page
-@app.route('/recommendations', methods=['GET'])
-def recommendations():
-    if 'user_id' not in session:
-        print("User not logged in, redirecting to login page.")
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    if not user:
-        print("User not found, redirecting to login page.")
-        return redirect(url_for('login'))
-
-    # Define latitude and longitude
-    latitude = 41.619549  # Example latitude
-    longitude = -93.598022  # Example longitude
-
-    # Get user's favorite cuisine and dietary restrictions
-    favorite_cuisines = [cuisine.strip().lower() for cuisine in user.favorite_cuisines.split(",")] if user.favorite_cuisines else []
-    dietary_restrictions = [restriction.strip().lower() for restriction in user.dietary_restrictions.split(",")] if user.dietary_restrictions else []
-
     print(f"Favorite Cuisines: {favorite_cuisines}")
     print(f"Dietary Restrictions: {dietary_restrictions}")
 
-    # Fetch the restaurants
-    all_restaurants = search_restaurants("restaurants", latitude, longitude, 25000, 20)
-
-    # Filter restaurants based on user preferences
+    # Fetch recommendations
+    latitude = 41.619549  # Example latitude
+    longitude = -93.598022  # Example longitude
+    all_restaurants = search_restaurants("restaurants", latitude, longitude, 25000, 20) or []
     recommended_restaurants = []
     for r in all_restaurants:
         restaurant_categories = [cat.get("title").lower() for cat in r.get("categories", [])]
-        print(f"Restaurant: {r.get('name', 'N/A')}, Categories: {restaurant_categories}")
-        if any(cat in favorite_cuisines for cat in restaurant_categories):
+        mapped_categories = [
+            cuisine.lower() for cat in restaurant_categories
+            for cuisine, mapped in CUISINE_MAPPING.items() if any(cat == m.lower() for m in mapped)
+        ]
+        if any(cat in favorite_cuisines for cat in mapped_categories):
             recommended_restaurants.append({
                 "name": r.get("name", "N/A"),
                 "address": ", ".join(r.get("location", {}).get("display_address", [])),
@@ -345,8 +316,15 @@ def recommendations():
 
     print(f"Recommended Restaurants: {recommended_restaurants}")
 
-    print("Rendering recommendations.html with recommended restaurants.")
-    return render_template('recommendations.html', restaurants=recommended_restaurants)
+    # Render the profile template with recommendations
+    return render_template(
+        'profile.html',
+        user=user,
+        favorite_cuisines=favorite_cuisines,
+        dietary_restrictions=dietary_restrictions,
+        recommendations=recommended_restaurants
+    )
+
 
 #Route for Updating profile 
 @app.route('/update_profile', methods=['POST'])
@@ -359,11 +337,19 @@ def update_profile():
     if not user:
         return redirect(url_for('login'))
     
-    # Update user preferences
-    user.favorite_cuisines = request.form.get('favorite_cuisines', '')
-    user.dietary_restrictions = request.form.get('dietary_restrictions', '')
-    user.profile_icon = request.form.get('profile_icon', user.profile_icon)  
-    
+    # Update user preferences only if provided
+    favorite_cuisines = request.form.get('favorite_cuisines', None)
+    dietary_restrictions = request.form.get('dietary_restrictions', None)
+    profile_icon = request.form.get('profile_icon', None)
+
+    # Only update fields if they are provided in the form
+    if favorite_cuisines is not None and favorite_cuisines.strip():
+        user.favorite_cuisines = favorite_cuisines.strip()
+    if dietary_restrictions is not None and dietary_restrictions.strip():
+        user.dietary_restrictions = dietary_restrictions.strip()
+    if profile_icon is not None:
+        user.profile_icon = profile_icon
+
     try:
         db.session.commit()
         return redirect(url_for('profile', user_id=user.user_id))
