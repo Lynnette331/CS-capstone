@@ -150,7 +150,19 @@ def submit_rating():
 def get_restaurants():
     try:
         cuisine = request.args.get('cuisine', None)  # Get cuisine from query params
-        restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 40000, 50)
+        restaurants = []
+        limit = 50  # Maximum allowed by Yelp API
+        offset = 0
+        max_results = 200  # Define the maximum number of results you want to fetch
+
+        while len(restaurants) < max_results:
+            # Fetch restaurants in batches of `limit`
+            batch = search_restaurants("restaurants", 41.619549, -93.598022, 40000, limit, offset)
+            if not batch:
+                break  # Stop if no more results are returned
+            restaurants.extend(batch)
+            offset += limit  #
+        #restaurants = search_restaurants("restaurants", 41.619549, -93.598022, 40000, 50)
 
         if cuisine:
             # Apply filtering based on cuisine

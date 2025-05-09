@@ -8,7 +8,7 @@ import requests
  
 #API_KEY = "DVMFX1f7xi1FDI2DnaeMoOwTtgH3y5CUpDT-Md1Xgg8BZhW1wUgnnUlJNNOMl92iuAxCUPFI_9mLs0iFFwfNLa_rFnDzSx2SzDChW1dwzlfNEz8G-ZEf9gy2RS-2Z3Yx"
 
-API_KEY = "MGye3-tgBQFs57g9g7yvjRdoT-UEECMME-OyjsNZa9nMKWajKe5Ss3Czgbus9IMU-kD3NUVdL-uvLGf1Loq4b4rIlfu4VTikf03_PTfeR-vfAvpNCuUfFtwt7XgGaHYx"
+API_KEY = "ZgBzdvT3Ff6IQf_kYFMVN4Wmv9b-T_7RMBmuY5vHwznzeN6fwK4S-r9Hfd4XsObXRePHwb1vWtASvtcHpD-hnRws81UWwT9Oy176og7HiACGiK0KXQKtoSOUyNUdaHYx"
 # Define constants
 
 BASE_URL = "https://api.yelp.com/v3/businesses/search"
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     radius = 161000  # almost 100 miles in meters
 
-    limit = 20      # Max results per request
+    limit = 30      # Max results per request
 
  
 
