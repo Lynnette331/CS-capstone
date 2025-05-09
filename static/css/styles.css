@@ -3,7 +3,7 @@
 :root {
     --background-color: #ffffff; /* Default background color */
     --login-box-color: rgba(255, 255, 255, 0.2); /* Default box color */
-    --login-header-color: #000000; /* 💥 black header! */
+    --login-header-color: #000000; /* black text */
     --login-text-color: #ffffff; /* white text */
     --restaurant-text-color: #333333; /* Default text color */
     --rating-box: #ffffff; /* Default rating box color */
@@ -23,7 +23,7 @@ body {
 body.dark-mode {
     --background-color: #000000;
     --login-box-color: rgba(82, 81, 81, 0.2);
-    --login-header-color: #ffffff; /* 🎨 Separate header color! */
+    --login-header-color: #ffffff; 
     --login-text-color: #fff; /* Default text color for login form */
     --restaurant-text-color: #fff;
     --rating-box:#333333; 
