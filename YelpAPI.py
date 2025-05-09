@@ -37,7 +37,7 @@ def search_restaurants(term, latitude, longitude, radius=161000, limit=200):
 
         longitude (float): Longitude of the search location.
 
-        radius (int): Search radius in meters (default: 20,000 meters / ~12 miles).
+        radius (int): Search radius in meters (default: 40,000 meters / ~30 miles).
 
         limit (int): Maximum number of results to return (default: 50).
 
